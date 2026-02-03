@@ -1,7 +1,3 @@
-// LeafletのCSSとJSをCodePenで読み込む場合
-// CSS: https://unpkg.com/leaflet/dist/leaflet.css
-// JS:  https://unpkg.com/leaflet/dist/leaflet.js
-
 // 地図初期設定
 const map = L.map('map').setView([33.5597, 133.5311], 9);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -25,18 +21,22 @@ const captionText = document.getElementById("caption");
 const span = document.getElementsByClassName("close")[0];
 span.onclick = () => { modal.style.display = "none"; };
 
-// マーカーを追加
+// マーカー追加
 spots.forEach(spot => {
   const marker = L.marker([spot.lat, spot.lng]).addTo(map);
-  marker.bindPopup(`<strong>${spot.name}</strong><br><img class="popup-image" src="${spot.img}" alt="${spot.name}">`);
+  const popupContent = `<strong>${spot.name}</strong><br><img class="popup-image" src="${spot.img}" alt="${spot.name}">`;
+  marker.bindPopup(popupContent);
 });
 
-// ポップアップ内画像クリックでモーダル表示
+// 画像クリックでモーダル表示
 map.on('popupopen', function(e) {
-  const img = e.popup.getElement().querySelector('img');
-  img.onclick = function() {
-    modal.style.display = "block";
-    modalImg.src = this.src;
-    captionText.innerHTML = e.popup.getContent().split('<br>')[0].replace('<strong>', '').replace('</strong>', '');
-  };
+  const popupNode = e.popup.getElement();
+  const img = popupNode.querySelector('img.popup-image');
+  if (img) {
+    img.onclick = function() {
+      modal.style.display = "block";
+      modalImg.src = this.src;
+      captionText.innerText = this.alt;
+    };
+  }
 });
